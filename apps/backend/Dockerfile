@@ -1,20 +1,20 @@
 FROM node:18-alpine
 
+# Install pnpm
+RUN corepack enable
+
 WORKDIR /usr/src/app
 
-# Copy package files
-COPY apps/backend/package*.json ./
-COPY package*.json ../
+# Copy entire project to maintain workspace structure
+COPY . .
 
-# Install dependencies
-RUN npm install
+# Install all dependencies in workspace root
+RUN pnpm install --no-frozen-lockfile
 
-# Copy source code
-COPY apps/backend .
-
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client from backend directory
+WORKDIR /usr/src/app/apps/backend
+RUN pnpm prisma generate
 
 EXPOSE 3001
 
-CMD ["npm", "run", "start:dev"]
+CMD ["pnpm", "run", "start:dev"]

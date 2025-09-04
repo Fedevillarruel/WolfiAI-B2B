@@ -13,7 +13,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -21,8 +21,9 @@ export default function LoginPage() {
       await login({ email, password });
       toast.success('¡Inicio de sesión exitoso!');
       router.push('/dashboard');
-    } catch (error: any) {
-      toast.error(error.message || 'Error al iniciar sesión');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

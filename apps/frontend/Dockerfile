@@ -1,17 +1,19 @@
 FROM node:18-alpine
 
+# Install pnpm
+RUN corepack enable
+
 WORKDIR /usr/src/app
 
-# Copy package files
-COPY apps/frontend/package*.json ./
-COPY package*.json ../
+# Copy entire project to maintain workspace structure
+COPY . .
 
-# Install dependencies
-RUN npm install
+# Install all dependencies in workspace root
+RUN pnpm install --no-frozen-lockfile
 
-# Copy source code
-COPY apps/frontend .
+# Change to frontend directory
+WORKDIR /usr/src/app/apps/frontend
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]

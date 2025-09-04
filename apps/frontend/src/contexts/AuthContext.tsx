@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import { User, AuthResponse, RegisterData, LoginData } from '@/types/auth';
 
@@ -46,25 +47,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (data: LoginData) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/login', data);
-      const { user, token } = response.data;
+      setLoading(true);
+      const response = await api.post('/auth/login', data);
+      const { token, user } = response.data;
       
+      // Guardar token
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       Cookies.set('auth-token', token, { expires: 7 });
+      
       setUser(user);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      toast.success('¡Bienvenido!');
+    } catch (error: unknown) {
+      console.error('Login error:', error);
+      toast.error('Error al iniciar sesión');
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (data: RegisterData) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/register', data);
-      const { user, token } = response.data;
+      setLoading(true);
+      const response = await api.post('/auth/register', data);
+      const { token, user } = response.data;
       
+      // Guardar token
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       Cookies.set('auth-token', token, { expires: 7 });
+      
       setUser(user);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
+      toast.success('¡Cuenta creada exitosamente!');
+    } catch (error: unknown) {
+      console.error('Register error:', error);
+      toast.error('Error al crear la cuenta');
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 

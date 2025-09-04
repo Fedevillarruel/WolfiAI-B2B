@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [tenantName, setTenantName] = useState('');
@@ -14,16 +15,17 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await register({ email, password, tenantName });
+      await register({ name, email, password, tenantName });
       toast.success('¡Registro exitoso! Bienvenido a WolfiAI');
       router.push('/dashboard');
-    } catch (error: any) {
-      toast.error(error.message || 'Error al registrarse');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al registrarse';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,22 @@ export default function RegisterPage() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Nombre completo
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Juan Pérez"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
             <div>
               <label htmlFor="tenantName" className="block text-sm font-medium text-gray-700">
                 Nombre de la empresa
